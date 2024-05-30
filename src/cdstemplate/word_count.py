@@ -56,12 +56,24 @@ class CorpusCounter:
         """
         before_vocab_size = self.get_vocab_size()
         non_empty_tokens = [w for w in token_list if w != ""]
+        #print(non_empty_tokens)
+        isSea = False
         if self.case_insensitive:
             logger.info("Adding %s token(s) case insensitively", len(token_list))
             self.token_counter.update([w.lower() for w in non_empty_tokens])
+            
         else:
             logger.info("Adding %s token(s) case insensitively", len(token_list))
             self.token_counter.update(non_empty_tokens)
+        if(self.token_counter['sea'] > 0):
+                isSea = True
+        else:
+            self.token_counter.update(['sea'])
+        logger.info([w.lower() for w in non_empty_tokens])
+        logger.info(self.token_counter['sea'])
+        logger.info(self.token_counter)
+        logger.info("<3 did the passage have the sea? %s", isSea)
+        logger.info("it does now? %s", self.token_counter['sea'])
         after_vocab_size = self.get_vocab_size()
 
         logger.info(

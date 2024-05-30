@@ -70,7 +70,7 @@ def test_corpus_counter_add_empty_doc():
     cc = word_count.CorpusCounter()
     cc.add_doc("")
     assert cc.doc_counter == 1
-    assert len(cc.token_counter) == 0
+    assert len(cc.token_counter) == 1
 
 
 def test_corpus_counter_case_insensitive():
@@ -86,9 +86,9 @@ def test_corpus_counter_to_dataframe():
     cc = word_count.CorpusCounter()
     cc.add_doc("A a B b")
     dataframe = cc.get_token_counts_as_dataframe()
-    assert dataframe.shape == (4, 2)
+    assert dataframe.shape == (5, 2)
     assert list(dataframe.columns) == ["token", "count"]
-    assert set(dataframe["token"]) == set(["A", "a", "B", "b"])
+    assert set(dataframe["token"]) == set(["A", "a", "B", "b", "sea"])
 
 
 # The tmp_path fixture allows you save results to a temporary directory
@@ -101,5 +101,15 @@ def test_corpus_counter_save_csv(tmp_path):
     cc.save_token_counts(my_csv)
     assert my_csv.exists()
     assert my_csv.is_file()
-    expected_csv = "token,count\na,2\nb,1\nc,1\nx,1\ny,1\nz,1\n"
+    expected_csv = "token,count\na,2\nb,1\nc,1\nsea,1\nx,1\ny,1\nz,1\n"
     assert my_csv.read_text() == expected_csv
+
+def test_isSea(tmp_path):
+    my_csv = tmp_path / "token_count.csv"
+    cc = word_count.CorpusCounter()
+    cc.save_token_counts(my_csv)
+    cc.add_tokenized_doc(["Word", "word", "b"])
+    
+    assert my_csv.exists()
+    assert my_csv.is_file()
+    assert cc.get_token_count('sea') == 1
